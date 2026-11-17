@@ -1,5 +1,0 @@
-# Audacious's plugins, which wmplayer runs, without what this machine has
-# no use for: the sound goes out through PipeWire alone, nothing draws with
-# OpenGL (the spectrum analyser in 3D) and nothing sends desktop
-# notifications.
-media-plugins/audacious-plugins -alsa -pulseaudio -opengl -libnotify

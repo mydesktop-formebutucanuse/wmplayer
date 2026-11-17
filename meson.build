@@ -101,8 +101,8 @@ endif
 conf = configuration_data()
 conf.set_quoted('BUILDSTAMP', get_option('buildstamp'))
 conf.set_quoted('COPYRIGHT', copyright)
-# The gettext domain: Audacious's translations are used.
-conf.set_quoted('PACKAGE', 'audacious')
+# The gettext domain; the plugins' is this with "-plugins" after it.
+conf.set_quoted('PACKAGE', 'wmplayer')
 conf.set_quoted('VERSION', meson.project_version())
 conf.set('PACKAGE_VERSION', meson.project_version())
 if host_machine.endian() == 'big'
@@ -166,18 +166,12 @@ endif
 
 
 install_bindir = get_option('bindir')
-# wmplayer runs Audacious's plugins, with Audacious's data (skins and so on),
-# from where Audacious has them. Its own libraries, which stand in for
-# Audacious's when the plugins are loaded, are apart.
-install_datadir = get_option('audacious_datadir')
-if install_datadir == ''
-  install_datadir = join_paths(get_option('datadir'), 'audacious')
-endif
-install_plugindir = get_option('plugindir')
-if install_plugindir == ''
-  install_plugindir = join_paths(get_option('libdir'), 'audacious')
-endif
+# Nothing of Audacious is needed where wmplayer is installed: the libraries
+# and, in a directory for each kind, the plugins (src/plugins, src/skins) are
+# in LIBDIR/wmplayer, the skins in DATADIR/wmplayer.
+install_datadir = join_paths(get_option('datadir'), 'wmplayer')
 install_libdir = join_paths(get_option('libdir'), 'wmplayer')
+install_plugindir = install_libdir
 install_rpath = join_paths(get_option('prefix'), install_libdir)
 install_localedir = get_option('localedir')
 install_desktoppath = join_paths(get_option('datadir'), 'applications')
@@ -190,9 +184,6 @@ install_metainfo_path = join_paths(get_option('datadir'), 'metainfo')
 conf.set_quoted('INSTALL_BINDIR', join_paths(get_option('prefix'), install_bindir))
 conf.set_quoted('INSTALL_DATADIR', join_paths(get_option('prefix'), install_datadir))
 conf.set_quoted('INSTALL_PLUGINDIR', join_paths(get_option('prefix'), install_plugindir))
-# The plugins that wmplayer builds itself (the Winamp-skin interface) are with
-# its libraries; one of them is loaded in place of Audacious's of that name.
-conf.set_quoted('INSTALL_OWN_PLUGINDIR', join_paths(get_option('prefix'), install_libdir))
 conf.set_quoted('INSTALL_LOCALEDIR', join_paths(get_option('prefix'), install_localedir))
 conf.set_quoted('INSTALL_DESKTOPFILE', join_paths(get_option('prefix'), install_desktopfile))
 conf.set_quoted('INSTALL_ICONFILE', join_paths(get_option('prefix'), install_iconfile))
@@ -238,12 +229,16 @@ config_h = configure_file(input: 'config.h.meson',
 
 
 subdir('src')
+subdir('po')
+subdir('po-plugins')
 subdir('images')
 if have_windows
   subdir('win32')
 endif
 
 
+# shown in the About window
+install_data('AUTHORS', 'COPYING', install_dir: install_datadir)
 install_data('wmplayer.desktop', install_dir: install_desktoppath)
 
 
@@ -253,7 +248,7 @@ summary({
   'Lib dir': get_option('libdir'),
   'Data dir': get_option('datadir'),
   'Plugins': install_plugindir,
-  'Audacious data': install_datadir,
+  'Skins and other data': install_datadir,
 }, section: 'Directories')
 
 summary({

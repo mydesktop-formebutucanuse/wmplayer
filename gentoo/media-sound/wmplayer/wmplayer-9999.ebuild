@@ -10,31 +10,44 @@ DESCRIPTION="Audacious with YouTube and SoundCloud built in"
 HOMEPAGE="https://github.com/mydesktop-formebutucanuse/wmplayer"
 EGIT_REPO_URI="https://github.com/mydesktop-formebutucanuse/wmplayer.git"
 
-# The Winamp-skin interface (src/skins) is under the GPL.
-LICENSE="BSD-2 GPL-3"
+# The plugins (src/plugins, src/skins) are under their own terms, the skin
+# Glare under CC-BY-SA.
+LICENSE="BSD-2 CC-BY-SA-4.0 GPL-2+ GPL-3+ ISC"
 SLOT="0"
 
+# From the second group on: what the plugins (src/plugins) decode, fetch and
+# play with.
 DEPEND="
 	>=dev-libs/glib-2.36:2
 	net-misc/curl
 	virtual/freedesktop-icon-theme
 	x11-libs/cairo
 	x11-libs/gdk-pixbuf:2
-	>=x11-libs/gtk+-3.24:3
+	>=x11-libs/gtk+-3.24:3[X]
 	x11-libs/pango
+
+	dev-libs/libxml2:2=
+	media-libs/faad2
+	>=media-libs/flac-1.2.1-r1:=
+	>=media-libs/libogg-1.1.3
+	>=media-libs/libvorbis-1.2.0
+	>=media-libs/opusfile-0.4
+	>=media-sound/mpg123-base-1.12
+	>=media-video/ffmpeg-4.2.3:=
+	>=media-video/pipewire-0.3.33:=
+	>=net-libs/neon-0.27:=
 "
-# wmplayer runs Audacious's plugins, with Audacious's skins and translations,
-# from where Audacious has them; its own libaudcore, libaudgui and libaudtag
-# are in /usr/lib*/wmplayer, and so is its Winamp-skin interface
-# (General/skins.so), which it loads in place of Audacious's. The plugin API
-# is that of Audacious 4.6.
+# wmplayer has its own plugins, skins, translations and audtool, and needs
+# nothing of Audacious. The two cannot be installed together: both have
+# /usr/bin/audtool, and both answer to the same name on D-Bus.
 RDEPEND="${DEPEND}
-	=media-sound/audacious-4.6*[gtk]
-	=media-plugins/audacious-plugins-4.6*[ffmpeg,gtk]
 	net-misc/yt-dlp
+	!media-sound/audacious
+	!media-plugins/audacious-plugins
 "
 BDEPEND="
 	>=dev-util/gdbus-codegen-2.80.5-r1
+	sys-devel/gettext
 	virtual/pkgconfig
 "
 
@@ -45,6 +58,15 @@ src_unpack() {
 	pushd "${S}/src/rust" >/dev/null || die
 	cargo_live_src_unpack
 	popd >/dev/null || die
+}
+
+src_prepare() {
+	default
+	# This ebuild takes Audacious and its plugins off the machine. Source
+	# from before wmplayer had plugins of its own (an older branch) would be
+	# left with none.
+	[[ -f src/plugins/meson.build ]] ||
+		die "this source has no plugins of its own (src/plugins); it needs the ebuild that came with it"
 }
 
 src_configure() {

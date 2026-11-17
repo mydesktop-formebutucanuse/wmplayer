@@ -8,12 +8,10 @@
 #ifndef SKINS_CONFIG_H
 #define SKINS_CONFIG_H
 
-/* The texts of the interface are translated in audacious-plugins. */
-#undef PACKAGE
-#define PACKAGE "audacious-plugins"
+/* the gettext domain of the plugins */
+#include "../plugins/plugins-config.h"
 
-/* The menu entries of these plugins of Audacious; an entry does nothing if
- * its plugin is not installed. */
+/* The menu entries of these plugins (src/plugins). */
 #define HAVE_PLAYBACK_HISTORY 1
 #define HAVE_PLAYLIST_MANAGER 1
 #define HAVE_SEARCH_TOOL 1
