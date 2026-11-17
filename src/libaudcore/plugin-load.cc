@@ -128,11 +128,38 @@ static void plugin_unload(LoadedModule & loaded)
 
 /******************************************************************/
 
+/* The files of wmplayer's own plugins, as "General/skins.so".  A plugin of
+ * Audacious with the name of one of them is left alone: the registry knows a
+ * plugin by its name, so what was set for Audacious's (that it is the
+ * interface in use, say) holds for wmplayer's. */
+static Index<String> own_plugins;
+
+struct ScanState
+{
+    const char * dir; /* the kind of plugin, as "General" */
+    bool own;         /* wmplayer's own plugins are being looked through */
+};
+
 static bool scan_plugin_func(const char * path, const char * basename,
                              void * data)
 {
     if (!str_has_suffix_nocase(basename, PLUGIN_SUFFIX))
         return false;
+
+    auto state = (const ScanState *)data;
+    StringBuf name = filename_build({state->dir, basename});
+
+    if (!state->own)
+    {
+        for (const String & own_name : own_plugins)
+        {
+            if (!strcmp(own_name, name))
+            {
+                AUDINFO("Skip plugin: %s (wmplayer has its own)\n", path);
+                return false;
+            }
+        }
+    }
 
     GStatBuf st;
     if (g_stat(path, &st) < 0)
@@ -142,14 +169,22 @@ static bool scan_plugin_func(const char * path, const char * basename,
     }
 
     if (S_ISREG(st.st_mode))
+    {
+        if (state->own)
+            own_plugins.append(String(name));
+
         plugin_register(path, st.st_mtime);
+    }
 
     return false;
 }
 
-static void scan_plugins(const char * path)
+static void scan_plugins(const char * path, const char * dir, bool own)
 {
-    dir_foreach(path, scan_plugin_func, nullptr);
+    ScanState state = {dir, own};
+
+    if (g_file_test(path, G_FILE_TEST_IS_DIR))
+        dir_foreach(path, scan_plugin_func, &state);
 }
 
 void plugin_system_init()
@@ -158,9 +193,15 @@ void plugin_system_init()
 
     plugin_registry_load();
 
+    const char * own_path = get_own_plugin_dir();
+    for (const char * dir : plugin_dir_list)
+        scan_plugins(filename_build({own_path, dir}), dir, true);
+
     const char * path = aud_get_path(AudPath::PluginDir);
     for (const char * dir : plugin_dir_list)
-        scan_plugins(filename_build({path, dir}));
+        scan_plugins(filename_build({path, dir}), dir, false);
+
+    own_plugins.clear();
 
     plugin_registry_prune();
 }

@@ -12,7 +12,8 @@ EGIT_REPO_URI="https://github.com/mydesktop-formebutucanuse/wmplayer.git"
 # master follows Audacious; wmplayer is on its own branch.
 EGIT_BRANCH="wmplayer"
 
-LICENSE="BSD-2"
+# The Winamp-skin interface (src/skins) is under the GPL.
+LICENSE="BSD-2 GPL-3"
 SLOT="0"
 
 DEPEND="
@@ -26,7 +27,9 @@ DEPEND="
 "
 # wmplayer runs Audacious's plugins, with Audacious's skins and translations,
 # from where Audacious has them; its own libaudcore, libaudgui and libaudtag
-# are in /usr/lib*/wmplayer. The plugin API is that of Audacious 4.6.
+# are in /usr/lib*/wmplayer, and so is its Winamp-skin interface
+# (General/skins.so), which it loads in place of Audacious's. The plugin API
+# is that of Audacious 4.6.
 RDEPEND="${DEPEND}
 	=media-sound/audacious-4.6*[gtk]
 	=media-plugins/audacious-plugins-4.6*[ffmpeg,gtk]

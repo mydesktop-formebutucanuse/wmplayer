@@ -15,6 +15,10 @@ What wmplayer adds:
 * Tracks are downloaded as they play (`~/.cache/wmplayer/web`, kept for a week
   after they were last played), so seeking works, and the next track of the
   playlist is fetched ahead.
+* The Winamp-skin interface keeps the skin's images in the X server and draws
+  from there (on the GPU, where the X server uses it) instead of sending the
+  pixels with every redraw. `server_pixmaps=FALSE` in the `[skins]` section of
+  `~/.config/wmplayer/config` turns that off.
 
 How it is put together:
 
@@ -22,8 +26,11 @@ How it is put together:
   downloads), `core-ffi` (its C interface, linked into libaudcore) and
   `gtk-ui` (the window, linked into libaudgui). The C++ side is
   `src/libaudcore/vfs_web.cc` and `src/libaudgui/web-browser.cc`.
+* The Winamp-skin interface is Audacious's plugin, in `src/skins` (GPL 3; see
+  the README there). It is installed as `LIBDIR/wmplayer/General/skins.so`
+  and loaded in place of Audacious's `skins.so`.
 * It needs `yt-dlp` at run time, and `cargo` and libcurl to build.
-* wmplayer installs next to Audacious and uses its plugins
+* wmplayer installs next to Audacious and uses its other plugins
   (`LIBDIR/audacious`), data (`DATADIR/audacious`) and translations. Its own
   libaudcore, libaudgui and libaudtag are in `LIBDIR/wmplayer`. `audtool`
   controls it (the D-Bus name is Audacious's, so only one of the two runs at a

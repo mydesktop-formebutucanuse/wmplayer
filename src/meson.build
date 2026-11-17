@@ -14,6 +14,7 @@ endif
 
 if get_option('gtk')
   subdir('libaudgui')
+  subdir('skins')
 endif
 
 

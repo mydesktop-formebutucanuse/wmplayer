@@ -124,6 +124,7 @@ int probe_by_filename(const char * filename);
 
 /* runtime.cc */
 extern size_t misc_bytes_allocated;
+const char * get_own_plugin_dir();
 
 /* strpool.cc */
 void string_leak_check();
