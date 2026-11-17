@@ -38,7 +38,7 @@
 #endif
 
 #define WANT_VFS_STDIO_COMPAT
-#include <audacious/audtag.h>
+#include <libaudtag/audtag.h>
 #include <libaudcore/audstrings.h>
 #include <libaudcore/i18n.h>
 #include <libaudcore/plugin.h>
