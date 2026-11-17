@@ -58,7 +58,11 @@ private:
     virtual void draw (cairo_t * cr) override;
     virtual bool button_press (GdkEventButton * event) override;
 
+    static void map_cb (GtkWidget * widget, TextBox * me);
+    static void unmap_cb (GtkWidget * widget, TextBox * me);
+
     void scroll_timeout ();
+    void update_timer ();
     void render_vector (const char * text);
     void render_bitmap (const char * text);
     void render ();
@@ -74,6 +78,7 @@ private:
     int m_width = 0, m_buf_width = 0;
     bool m_may_scroll = false, m_two_way = false;
     bool m_scrolling = false, m_backward = false;
+    bool m_mapped = false;  /* on screen: shown, in a window that is shown */
     int m_offset = 0, m_delay = 0;
 
     PressCB press = nullptr;

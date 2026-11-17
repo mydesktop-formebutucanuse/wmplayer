@@ -97,8 +97,13 @@ HSlider::HSlider (int min, int max, SkinPixmapId si, int w, int h, int fx,
     add_input (w, h, true, true);
 }
 
+/* The setters are called four times a second while a song plays, mostly with
+ * the values the slider already has: redraw only when one of them changed. */
 void HSlider::set_frame (int fx, int fy)
 {
+    if (m_fx == fx && m_fy == fy)
+        return;
+
     m_fx = fx;
     m_fy = fy;
     queue_draw ();
@@ -106,6 +111,9 @@ void HSlider::set_frame (int fx, int fy)
 
 void HSlider::set_knob (int knx, int kny, int kpx, int kpy)
 {
+    if (m_knx == knx && m_kny == kny && m_kpx == kpx && m_kpy == kpy)
+        return;
+
     m_knx = knx;
     m_kny = kny;
     m_kpx = kpx;
@@ -118,12 +126,19 @@ void HSlider::set_pos (int pos)
     if (m_pressed)
         return;
 
-    m_pos = aud::clamp (pos, m_min, m_max);
+    pos = aud::clamp (pos, m_min, m_max);
+    if (m_pos == pos)
+        return;
+
+    m_pos = pos;
     queue_draw ();
 }
 
 void HSlider::set_pressed (bool pressed)
 {
+    if (m_pressed == pressed)
+        return;
+
     m_pressed = pressed;
     queue_draw ();
 }

@@ -4,7 +4,7 @@
 
 #include <neaacdec.h>
 
-#include <audacious/audtag.h>
+#include <libaudtag/audtag.h>
 #include <libaudcore/i18n.h>
 #include <libaudcore/plugin.h>
 #include <libaudcore/runtime.h>
