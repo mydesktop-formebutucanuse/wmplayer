@@ -2,8 +2,9 @@
 
 This is the `skins` plugin of Audacious (audacious-plugins 4.6.2, `src/skins`;
 `src/ui-common` holds the three menu files it shares with the GTK interface),
-built by wmplayer and loaded in place of Audacious's `General/skins.so`. The
-skins themselves, and the translations, are still those of audacious-plugins.
+built by wmplayer as `General/skins.so`. The skins themselves are in
+`src/skins-data`, the translations in `po-plugins`, both from
+audacious-plugins too.
 
 The code is under the GNU General Public License, version 3 (see the head of
 each file); it is a module of its own, as it is in Audacious.
@@ -26,6 +27,9 @@ server draws with it) instead of uploading the pixels each time:
 * `skins_cfg.h`, `skins_cfg.cc`: `server_pixmaps` in the `[skins]` section of
   the configuration (default `TRUE`); `FALSE` draws from the images as
   Audacious does.
+* `plugin.cc`: a skin of Audacious's that the settings name (they are carried
+  over from Audacious) and that is no longer there is taken from wmplayer's
+  skins; the user's own skins are in `~/.local/share/wmplayer/Skins`.
 * `meson.build`, `skins-config.h`: the build inside wmplayer.
 
 The visualiser is drawn from an image as before: its pixels change with every

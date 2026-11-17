@@ -102,7 +102,7 @@ static String skin_thumb_dir;
 const char * skins_get_user_skin_dir ()
 {
     if (! user_skin_dir)
-        user_skin_dir = String (filename_build ({g_get_user_data_dir (), "audacious", "Skins"}));
+        user_skin_dir = String (filename_build ({g_get_user_data_dir (), "wmplayer", "Skins"}));
 
     return user_skin_dir;
 }
@@ -110,7 +110,7 @@ const char * skins_get_user_skin_dir ()
 const char * skins_get_skin_thumb_dir ()
 {
     if (! skin_thumb_dir)
-        skin_thumb_dir = String (filename_build ({g_get_user_cache_dir (), "audacious", "thumbs-unscaled"}));
+        skin_thumb_dir = String (filename_build ({g_get_user_cache_dir (), "wmplayer", "thumbs-unscaled"}));
 
     return skin_thumb_dir;
 }
@@ -118,6 +118,19 @@ const char * skins_get_skin_thumb_dir ()
 static bool load_initial_skin ()
 {
     String path = aud_get_str ("skins", "skin");
+
+    /* The settings may be Audacious's, carried over, and name a skin that came
+     * with it: the skin of that name that comes with wmplayer is used. */
+    if (path[0] && ! g_file_test (path, G_FILE_TEST_EXISTS))
+    {
+        char * name = g_path_get_basename (path);
+        StringBuf own = filename_build ({aud_get_path (AudPath::DataDir), "Skins", name});
+        g_free (name);
+
+        if (g_file_test (own, G_FILE_TEST_EXISTS))
+            path = String (own);
+    }
+
     if (path[0] && skin_load (path))
         return true;
 

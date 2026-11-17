@@ -1,7 +1,6 @@
 # The Winamp-skin interface: the "skins" plugin of audacious-plugins 4.6.2
 # (GPL), changed to keep the skin's images in the X server (see README.md
-# here). It is installed with wmplayer's libraries, and wmplayer loads it in
-# place of Audacious's plugin of the same name (libaudcore/plugin-load.cc).
+# here). The skins themselves are in ../skins-data.
 
 skins_sources = [
   'actions.cc',
@@ -50,6 +49,6 @@ shared_module('skins',
   link_with: [libaudcore_lib, libaudgui_lib],
   name_prefix: '',
   install: true,
-  install_dir: join_paths(install_libdir, 'General'),
+  install_dir: join_paths(install_plugindir, 'General'),
   install_rpath: install_rpath
 )

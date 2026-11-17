@@ -27,23 +27,31 @@ How it is put together:
   `gtk-ui` (the window, linked into libaudgui). The C++ side is
   `src/libaudcore/vfs_web.cc` and `src/libaudgui/web-browser.cc`.
 * The Winamp-skin interface is Audacious's plugin, in `src/skins` (GPL 3; see
-  the README there). It is installed as `LIBDIR/wmplayer/General/skins.so`
-  and loaded in place of Audacious's `skins.so`.
+  the README there), with its skins in `src/skins-data`.
+* The other plugins are in `src/plugins`, taken from audacious-plugins 4.6.2,
+  each under its own terms: what is needed to play files and network streams
+  through PipeWire (FFmpeg, MP3, AAC, FLAC, Vorbis and Opus; files and HTTP;
+  M3U, PLS, XSPF, ASX and Audacious's own playlists), and the playlist
+  manager, the search tool and the playback history of the interface's menus.
+  There is no other output, no effect and no visualisation plugin, and no GTK
+  or Qt interface.
+* Nothing of Audacious needs to be installed: the libraries and the plugins
+  are in `LIBDIR/wmplayer`, the skins in `DATADIR/wmplayer`, the translations
+  in the gettext domains `wmplayer` and `wmplayer-plugins` (`po`,
+  `po-plugins`). Audacious cannot be installed beside it: wmplayer comes with
+  `audtool`, which controls it, and has Audacious's name on D-Bus.
 * It needs `yt-dlp` at run time, and `cargo` and libcurl to build.
-* wmplayer installs next to Audacious and uses its other plugins
-  (`LIBDIR/audacious`), data (`DATADIR/audacious`) and translations. Its own
-  libaudcore, libaudgui and libaudtag are in `LIBDIR/wmplayer`. `audtool`
-  controls it (the D-Bus name is Audacious's, so only one of the two runs at a
-  time).
 * Settings are in `~/.config/wmplayer`; the first start copies
-  `~/.config/audacious`.
+  `~/.config/audacious`, and a skin of Audacious's named there is taken from
+  wmplayer's.
 * Not yet: live streams, encrypted HLS, the Qt interface.
 
 Build and install:
 
     meson setup build && ninja -C build && sudo ninja -C build install
 
-or, on Gentoo, `sudo sh gentoo/install.sh` (a live ebuild in a local overlay).
+or, on Gentoo, `sudo sh gentoo/install.sh` (a live ebuild in a local overlay;
+it has emerge remove Audacious and its plugins).
 
 ---
 
