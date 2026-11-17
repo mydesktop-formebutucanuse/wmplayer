@@ -115,6 +115,30 @@ void TextBox::scroll_timeout ()
     draw_now ();
 }
 
+/* The timer runs only while the text is on screen.  A text box in a hidden
+ * window, or in the half of a window that is not shown (shaded or not), would
+ * otherwise wake the player thirty times a second to draw nothing.  The
+ * scrolling goes on from where it was when the text box is shown again. */
+void TextBox::update_timer ()
+{
+    if (m_scrolling && m_mapped)
+        scroll_timer.start ();
+    else
+        scroll_timer.stop ();
+}
+
+void TextBox::map_cb (GtkWidget * widget, TextBox * me)
+{
+    me->m_mapped = true;
+    me->update_timer ();
+}
+
+void TextBox::unmap_cb (GtkWidget * widget, TextBox * me)
+{
+    me->m_mapped = false;
+    me->update_timer ();
+}
+
 void TextBox::render_vector (const char * text)
 {
     PangoLayout * layout = gtk_widget_create_pango_layout (gtk_dr (), text);
@@ -268,11 +292,7 @@ void TextBox::render ()
     }
 
     queue_draw ();
-
-    if (m_scrolling)
-        scroll_timer.start ();
-    else
-        scroll_timer.stop ();
+    update_timer ();
 }
 
 void TextBox::set_width (int width)
@@ -315,6 +335,9 @@ void TextBox::set_scroll (bool scroll)
 
 TextBox::~TextBox ()
 {
+    g_signal_handlers_disconnect_by_func (gtk_dr (), (void *) map_cb, this);
+    g_signal_handlers_disconnect_by_func (gtk_dr (), (void *) unmap_cb, this);
+
     int idx = textboxes.find (this);
     if (idx >= 0)
         textboxes.remove (idx, 1);
@@ -327,6 +350,8 @@ TextBox::TextBox (int width, const char * font, bool scroll) :
 {
     /* size is computed by set_font() */
     add_input (1, 1, false, true);
+    g_signal_connect (gtk_dr (), "map", (GCallback) map_cb, this);
+    g_signal_connect (gtk_dr (), "unmap", (GCallback) unmap_cb, this);
     set_font (font);
 
     textboxes.append (this);

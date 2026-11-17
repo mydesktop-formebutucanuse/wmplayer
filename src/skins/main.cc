@@ -378,14 +378,31 @@ static void info_change ()
     mainwin_set_song_info (bitrate, samplerate, channels);
 }
 
+static void mainwin_update_volume ();
+
+/* The time and the position are read four times a second, but only while a
+ * song is playing: when playback is stopped or paused they do not change, and
+ * the timer would only wake the player up.  The volume is followed through
+ * the "volume change" hook instead. */
+static void song_info_timer (bool run)
+{
+    if (run)
+        timer_add (TimerRate::Hz4, (TimerFunc) mainwin_update_song_info);
+    else
+        timer_remove (TimerRate::Hz4, (TimerFunc) mainwin_update_song_info);
+}
+
 static void playback_pause ()
 {
     mainwin_playstatus->set_status (STATUS_PAUSE);
+    song_info_timer (false);
+    mainwin_update_song_info ();
 }
 
 static void playback_unpause ()
 {
     mainwin_playstatus->set_status (STATUS_PLAY);
+    song_info_timer (true);
 }
 
 void mainwin_playback_begin ()
@@ -419,6 +436,7 @@ static void mainwin_playback_stop ()
 {
     seeking = false;
     timer_remove (TimerRate::Hz10, seek_timeout);
+    song_info_timer (false);
 
     mainwin_set_song_title (nullptr);
 
@@ -1188,12 +1206,15 @@ static void mainwin_create_window ()
     hook_associate ("set shuffle", (HookFunction) shuffle_toggled, nullptr);
     hook_associate ("set no_playlist_advance", (HookFunction) no_advance_toggled, nullptr);
     hook_associate ("set stop_after_current_song", (HookFunction) stop_after_song_toggled, nullptr);
+    hook_associate ("volume change", (HookFunction) mainwin_update_volume, nullptr);
+    hook_associate ("set software_volume_control", (HookFunction) mainwin_update_volume, nullptr);
 }
 
 void mainwin_unhook ()
 {
     seeking = false;
     timer_remove (TimerRate::Hz10, seek_timeout);
+    song_info_timer (false);
 
     status_message_timeout.stop ();
     mainwin_volume_release_timeout.stop ();
@@ -1211,6 +1232,8 @@ void mainwin_unhook ()
     hook_dissociate ("set shuffle", (HookFunction) shuffle_toggled);
     hook_dissociate ("set no_playlist_advance", (HookFunction) no_advance_toggled);
     hook_dissociate ("set stop_after_current_song", (HookFunction) stop_after_song_toggled);
+    hook_dissociate ("volume change", (HookFunction) mainwin_update_volume);
+    hook_dissociate ("set software_volume_control", (HookFunction) mainwin_update_volume);
 
     start_stop_visual (true);
 

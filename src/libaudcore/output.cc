@@ -780,6 +780,9 @@ EXPORT void aud_drct_set_volume(StereoVolume volume)
     }
     else if (cop)
         cop->set_volume(volume);
+
+    /* lets an interface follow the volume without asking for it on a timer */
+    event_queue("volume change", nullptr);
 }
 
 PluginHandle * output_plugin_get_current()

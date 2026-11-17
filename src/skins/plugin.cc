@@ -166,8 +166,6 @@ static void skins_init_main (bool restart)
         mainwin_playback_begin ();
     else
         mainwin_update_song_info ();
-
-    timer_add (TimerRate::Hz4, (TimerFunc) mainwin_update_song_info);
 }
 
 bool SkinnedUI::init ()
@@ -203,8 +201,6 @@ static void skins_cleanup_main ()
     mainwin_unhook ();
     equalizerwin_unhook ();
     playlistwin_unhook ();
-
-    timer_remove (TimerRate::Hz4, (TimerFunc) mainwin_update_song_info);
 
     gtk_widget_destroy (mainwin->gtk ()); mainwin = nullptr;
     gtk_widget_destroy (playlistwin->gtk ()); playlistwin = nullptr;
