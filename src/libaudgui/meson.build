@@ -27,7 +27,8 @@ libaudgui_sources = [
   'status.cc',
   'urilist.cc',
   'url-opener.cc',
-  'util.cc'
+  'util.cc',
+  'web-browser.cc'
 ]
 
 
@@ -46,16 +47,15 @@ image_resources = gnome.compile_resources(
 )
 
 
-install_headers(libaudgui_headers, subdir: 'libaudgui')
-
-
 libaudgui_lib = library('audgui',
   libaudgui_sources,
   image_resources,
   include_directories: [src_inc],
-  dependencies: [gtk_dep, intl_dep],
+  dependencies: [gtk_dep, intl_dep, wmplayer_gtk_dep],
   link_with: [libaudcore_lib],
   soversion: '7',
   version: '7.0.0',
-  install: true
+  install: true,
+  install_dir: install_libdir,
+  install_rpath: install_rpath
 )

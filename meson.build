@@ -1,6 +1,6 @@
-project('audacious', 'c', 'cpp',
+project('wmplayer', 'c', 'cpp',
         version: '4.7-devel',
-        meson_version: '>= 0.53',
+        meson_version: '>= 0.60',
         default_options: [
           'c_std=gnu99',
           'cpp_std=gnu++17',
@@ -101,7 +101,8 @@ endif
 conf = configuration_data()
 conf.set_quoted('BUILDSTAMP', get_option('buildstamp'))
 conf.set_quoted('COPYRIGHT', copyright)
-conf.set_quoted('PACKAGE', meson.project_name())
+# The gettext domain: Audacious's translations are used.
+conf.set_quoted('PACKAGE', 'audacious')
 conf.set_quoted('VERSION', meson.project_version())
 conf.set('PACKAGE_VERSION', meson.project_version())
 if host_machine.endian() == 'big'
@@ -165,13 +166,24 @@ endif
 
 
 install_bindir = get_option('bindir')
-install_datadir = join_paths(get_option('datadir'), 'audacious')
-install_plugindir = join_paths(get_option('libdir'), 'audacious')
+# wmplayer runs Audacious's plugins, with Audacious's data (skins and so on),
+# from where Audacious has them. Its own libraries, which stand in for
+# Audacious's when the plugins are loaded, are apart.
+install_datadir = get_option('audacious_datadir')
+if install_datadir == ''
+  install_datadir = join_paths(get_option('datadir'), 'audacious')
+endif
+install_plugindir = get_option('plugindir')
+if install_plugindir == ''
+  install_plugindir = join_paths(get_option('libdir'), 'audacious')
+endif
+install_libdir = join_paths(get_option('libdir'), 'wmplayer')
+install_rpath = join_paths(get_option('prefix'), install_libdir)
 install_localedir = get_option('localedir')
 install_desktoppath = join_paths(get_option('datadir'), 'applications')
-install_desktopfile = join_paths(install_desktoppath, 'audacious.desktop')
+install_desktopfile = join_paths(install_desktoppath, 'wmplayer.desktop')
 install_iconpath = join_paths(get_option('datadir'), 'icons')
-install_iconfile = join_paths(install_iconpath, 'hicolor', '48x48', 'apps', 'audacious.png')
+install_iconfile = join_paths(install_iconpath, 'hicolor', '48x48', 'apps', 'wmplayer.png')
 install_metainfo_path = join_paths(get_option('datadir'), 'metainfo')
 
 
@@ -181,8 +193,6 @@ conf.set_quoted('INSTALL_PLUGINDIR', join_paths(get_option('prefix'), install_pl
 conf.set_quoted('INSTALL_LOCALEDIR', join_paths(get_option('prefix'), install_localedir))
 conf.set_quoted('INSTALL_DESKTOPFILE', join_paths(get_option('prefix'), install_desktopfile))
 conf.set_quoted('INSTALL_ICONFILE', join_paths(get_option('prefix'), install_iconfile))
-conf.set('plugindir', install_plugindir)
-conf.set('datarootdir', get_option('datadir'))
 
 
 if get_option('dbus')
@@ -225,38 +235,13 @@ config_h = configure_file(input: 'config.h.meson',
 
 
 subdir('src')
-subdir('po')
-subdir('man')
 subdir('images')
 if have_windows
   subdir('win32')
 endif
 
 
-install_data('AUTHORS', 'COPYING')
-install_data('audacious.desktop', install_dir: install_desktoppath)
-install_data('audacious.metainfo.xml', install_dir: install_metainfo_path)
-
-
-pkg = import('pkgconfig')
-
-# When Meson fixes the utter disappointment that is
-# https://github.com/mesonbuild/meson/issues/5836,
-# use libaudcore_lib as base dependency here.
-pkg.generate(
-  libraries: ['-L${libdir} -laudcore', intl_dep],
-  variables: [
-    'plugin_dir=${libdir}/audacious',
-
-    # Appease broken third-party plugin build systems.
-    'audacious_include_dir=${includedir}',
-    'include_dir=${includedir}',
-    'lib_dir=${libdir}'
-  ],
-  description: 'versatile and handy multi platform media player',
-  name: 'audacious',
-  url: 'https://audacious-media-player.org'
-)
+install_data('wmplayer.desktop', install_dir: install_desktoppath)
 
 
 summary({
@@ -264,6 +249,8 @@ summary({
   'Bin dir': get_option('bindir'),
   'Lib dir': get_option('libdir'),
   'Data dir': get_option('datadir'),
+  'Plugins': install_plugindir,
+  'Audacious data': install_datadir,
 }, section: 'Directories')
 
 summary({

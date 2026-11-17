@@ -45,6 +45,8 @@ struct ScanRequest
 
     PluginHandle * decoder;
     Tuple tuple;
+    /* <tuple> was valid, and has been read again (a web track's) */
+    bool tuple_changed = false;
 
     InputPlugin * ip;
     VFSFile file;

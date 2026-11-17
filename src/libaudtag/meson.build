@@ -13,9 +13,6 @@ libaudtag_sources = [
 libaudtag_inc = include_directories('.')
 
 
-install_headers('audtag.h', subdir: 'audacious')
-
-
 libaudtag_lib = library('audtag',
   libaudtag_sources,
   include_directories: src_inc,
@@ -23,5 +20,7 @@ libaudtag_lib = library('audtag',
   link_with: libaudcore_lib,
   version: '4.0.0',
   soversion: 4,
-  install: true
+  install: true,
+  install_dir: install_libdir,
+  install_rpath: install_rpath
 )

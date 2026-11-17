@@ -1,0 +1,16 @@
+# The parts of wmplayer that are written in Rust. Meson builds them with
+# cargo-build.sh and links them in: core-ffi into libaudcore, gtk-ui into
+# libaudgui. The wmplayer crate is what both are made of.
+
+[workspace]
+resolver = "2"
+members = ["wmplayer", "core-ffi", "gtk-ui"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "BSD-2-Clause"
+rust-version = "1.80"
+
+[profile.release]
+debug = 1

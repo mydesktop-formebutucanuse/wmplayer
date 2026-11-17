@@ -30,11 +30,15 @@ if have_windows
 endif
 
 
-audacious_exe = executable('audacious',
+# DT_RPATH, not DT_RUNPATH: it is also searched for what the plugins need,
+# so they get wmplayer's libaudcore, libaudgui and libaudtag.
+audacious_exe = executable('wmplayer',
   audacious_sources,
   include_directories: audacious_incs,
   dependencies: audacious_deps,
   link_with: audacious_libs,
   kwargs: audacious_kwargs,
-  install: true
+  link_args: ['-Wl,--disable-new-dtags'],
+  install: true,
+  install_rpath: install_rpath
 )

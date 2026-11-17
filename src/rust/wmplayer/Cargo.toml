@@ -1,0 +1,11 @@
+[package]
+name = "wmplayer"
+description = "YouTube and SoundCloud in wmplayer: search, lists, and the tracks themselves"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+curl = { version = "0.4", default-features = false }
+serde_json = "1"

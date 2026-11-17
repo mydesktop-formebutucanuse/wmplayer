@@ -65,4 +65,8 @@ void portal_cleanup ();
 void status_init ();
 void status_cleanup ();
 
+/* web-browser.cc */
+void web_browser_init ();
+void web_browser_cleanup ();
+
 #endif /* AUDGUI_INTERNAL_H */

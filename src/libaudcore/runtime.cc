@@ -48,6 +48,8 @@
 #include "playlist-internal.h"
 #include "plugins-internal.h"
 #include "scanner.h"
+#include "vfs_web.h"
+#include "wmweb.h"
 
 #define AUTOSAVE_INTERVAL 300000 /* milliseconds, autosave every 5 minutes */
 
@@ -250,11 +252,25 @@ static void set_config_paths()
 {
     const char * xdg_config_home = g_get_user_config_dir();
     StringBuf name = (instance_number == 1)
-                         ? str_copy("audacious")
-                         : str_printf("audacious-%d", instance_number);
+                         ? str_copy("wmplayer")
+                         : str_printf("wmplayer-%d", instance_number);
 
     aud_paths[AudPath::UserDir] =
         String(filename_build({xdg_config_home, name}));
+
+    /* the first start: Audacious's settings and playlists are carried over */
+    if (instance_number == 1)
+    {
+        StringBuf old = filename_build({xdg_config_home, "audacious"});
+        int copied = wmplayer_migrate_config(old, aud_paths[AudPath::UserDir]);
+
+        if (copied > 0)
+            AUDINFO("Copied %s to %s.\n", (const char *)old,
+                    (const char *)aud_paths[AudPath::UserDir]);
+        else if (copied < 0)
+            AUDERR("Failed to copy %s to %s.\n", (const char *)old,
+                   (const char *)aud_paths[AudPath::UserDir]);
+    }
     aud_paths[AudPath::PlaylistDir] =
         String(filename_build({aud_paths[AudPath::UserDir], "playlists"}));
 
@@ -325,6 +341,7 @@ EXPORT void aud_init()
 
     record_init();
     scanner_init();
+    web_init();
     load_playlists();
 }
 
@@ -366,6 +383,7 @@ EXPORT void aud_cleanup()
 
     adder_cleanup();
     scanner_cleanup();
+    web_cleanup();
     record_cleanup();
 
     /* In Qt mode, this deletes the QApplication. This must be done
