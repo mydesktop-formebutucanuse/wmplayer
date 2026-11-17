@@ -17,6 +17,7 @@
 #mesondefine INSTALL_BINDIR
 #mesondefine INSTALL_DATADIR
 #mesondefine INSTALL_PLUGINDIR
+#mesondefine INSTALL_OWN_PLUGINDIR
 #mesondefine INSTALL_LOCALEDIR
 #mesondefine INSTALL_DESKTOPFILE
 #mesondefine INSTALL_ICONFILE

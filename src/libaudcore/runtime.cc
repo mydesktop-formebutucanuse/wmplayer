@@ -183,8 +183,12 @@ static String relocate_path(const char * path, const char * from,
     return String(str_printf("%.*s%s", newlen, to, path + oldlen));
 }
 
+/* where wmplayer's own plugins are (see plugin-load.cc) */
+static String own_plugin_dir;
+
 static void set_default_paths()
 {
+    own_plugin_dir = String(INSTALL_OWN_PLUGINDIR);
     aud_paths[AudPath::BinDir] = String(INSTALL_BINDIR);
     aud_paths[AudPath::DataDir] = String(INSTALL_DATADIR);
     aud_paths[AudPath::PluginDir] = String(INSTALL_PLUGINDIR);
@@ -198,6 +202,8 @@ static void set_install_paths()
     StringBuf bindir = filename_normalize(str_copy(INSTALL_BINDIR));
     StringBuf datadir = filename_normalize(str_copy(INSTALL_DATADIR));
     StringBuf plugindir = filename_normalize(str_copy(INSTALL_PLUGINDIR));
+    StringBuf ownplugindir =
+        filename_normalize(str_copy(INSTALL_OWN_PLUGINDIR));
     StringBuf localedir = filename_normalize(str_copy(INSTALL_LOCALEDIR));
     StringBuf desktopfile = filename_normalize(str_copy(INSTALL_DESKTOPFILE));
     StringBuf iconfile = filename_normalize(str_copy(INSTALL_ICONFILE));
@@ -243,6 +249,7 @@ static void set_install_paths()
     aud_paths[AudPath::BinDir] = relocate_path(bindir, from, to);
     aud_paths[AudPath::DataDir] = relocate_path(datadir, from, to);
     aud_paths[AudPath::PluginDir] = relocate_path(plugindir, from, to);
+    own_plugin_dir = relocate_path(ownplugindir, from, to);
     aud_paths[AudPath::LocaleDir] = relocate_path(localedir, from, to);
     aud_paths[AudPath::DesktopFile] = relocate_path(desktopfile, from, to);
     aud_paths[AudPath::IconFile] = relocate_path(iconfile, from, to);
@@ -285,6 +292,13 @@ static void set_config_paths()
     g_setenv("XDG_DATA_HOME", g_get_user_data_dir(), true);
     g_setenv("XDG_CACHE_HOME", g_get_user_cache_dir(), true);
 #endif
+}
+
+const char * get_own_plugin_dir()
+{
+    /* set along with the plugin directory */
+    aud_get_path(AudPath::PluginDir);
+    return own_plugin_dir;
 }
 
 EXPORT const char * aud_get_path(AudPath id)

@@ -190,6 +190,9 @@ install_metainfo_path = join_paths(get_option('datadir'), 'metainfo')
 conf.set_quoted('INSTALL_BINDIR', join_paths(get_option('prefix'), install_bindir))
 conf.set_quoted('INSTALL_DATADIR', join_paths(get_option('prefix'), install_datadir))
 conf.set_quoted('INSTALL_PLUGINDIR', join_paths(get_option('prefix'), install_plugindir))
+# The plugins that wmplayer builds itself (the Winamp-skin interface) are with
+# its libraries; one of them is loaded in place of Audacious's of that name.
+conf.set_quoted('INSTALL_OWN_PLUGINDIR', join_paths(get_option('prefix'), install_libdir))
 conf.set_quoted('INSTALL_LOCALEDIR', join_paths(get_option('prefix'), install_localedir))
 conf.set_quoted('INSTALL_DESKTOPFILE', join_paths(get_option('prefix'), install_desktopfile))
 conf.set_quoted('INSTALL_ICONFILE', join_paths(get_option('prefix'), install_iconfile))
