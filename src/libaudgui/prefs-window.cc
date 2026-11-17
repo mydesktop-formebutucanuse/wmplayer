@@ -62,7 +62,7 @@ struct TitleFieldTag {
 };
 
 static const char aud_version_string[] =
- "<span size='small'>Audacious " VERSION " (" BUILDSTAMP ")</span>";
+ "<span size='small'>wmplayer " VERSION " (" BUILDSTAMP ")</span>";
 
 static GtkWidget * prefswin;
 static GtkWidget * category_treeview, * category_notebook, * plugin_notebook;
@@ -887,7 +887,7 @@ static void create_prefs_window ()
     prefswin = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     gtk_window_set_type_hint ((GtkWindow *) prefswin, GDK_WINDOW_TYPE_HINT_DIALOG);
     gtk_container_set_border_width ((GtkContainer *) prefswin, 12);
-    gtk_window_set_title ((GtkWindow *) prefswin, _("Audacious Settings"));
+    gtk_window_set_title ((GtkWindow *) prefswin, "wmplayer Settings");
     gtk_window_set_role ((GtkWindow *) prefswin, "settings");
 
     GtkWidget * vbox = audgui_vbox_new (0);

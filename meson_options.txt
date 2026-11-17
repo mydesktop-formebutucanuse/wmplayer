@@ -1,6 +1,10 @@
+option('plugindir', type: 'string', value: '',
+       description: 'Where the plugins are (default: LIBDIR/audacious)')
+option('audacious_datadir', type: 'string', value: '',
+       description: 'Where the data of Audacious and its plugins is (default: DATADIR/audacious)')
 option('dbus', type: 'boolean', value: true,
        description: 'Whether D-Bus support is enabled')
-option('qt', type: 'boolean', value: true,
+option('qt', type: 'boolean', value: false,
        description: 'Whether Qt support is enabled')
 option('qt5', type: 'boolean', value: false,
        description: 'Whether Qt 5 support is enabled')

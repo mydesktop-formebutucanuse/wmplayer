@@ -204,7 +204,7 @@ static void print_help()
 {
     static const char pad[21] = "                    ";
 
-    fprintf(stderr, "%s", _("Usage: audacious [OPTION] ... [FILE] ...\n\n"));
+    fprintf(stderr, "%s", "Usage: wmplayer [OPTION] ... [FILE] ...\n\n");
     fprintf(stderr, "  -1, -2, -3, etc.          %s\n",
             _("Select instance to run/control"));
 
@@ -389,7 +389,7 @@ int main(int argc, char ** argv)
 
     if (options.version)
     {
-        printf("%s %s (%s)\n", _("Audacious"), VERSION, BUILDSTAMP);
+        printf("%s %s (%s)\n", "wmplayer", VERSION, BUILDSTAMP);
         return EXIT_SUCCESS;
     }
 

@@ -54,6 +54,7 @@ libaudcore_sources = [
   'vfs.cc',
   'vfs_async.cc',
   'vfs_local.cc',
+  'vfs_web.cc',
   'vis-runner.cc',
   'visualization.cc'
 ]
@@ -92,8 +93,7 @@ libaudcore_headers = [
 
 audio_h = configure_file(input: 'audio.h.in',
   output: 'audio.h',
-  configuration: conf,
-  install_dir: join_paths(get_option('includedir'), 'libaudcore'))
+  configuration: conf)
 
 
 libaudcore_deps = [glib_dep, gmodule_dep, intl_dep]
@@ -123,7 +123,7 @@ else
   endif
 endif
 
-libaudcore_deps += [iconv_dep]
+libaudcore_deps += [iconv_dep, wmplayer_core_dep]
 
 
 libaudcore_lib = library('audcore',
@@ -134,8 +134,7 @@ libaudcore_lib = library('audcore',
   link_with: libguess_lib,
   version: '6.0.0',
   soversion: '6',
-  install: true
+  install: true,
+  install_dir: install_libdir,
+  install_rpath: install_rpath
 )
-
-
-install_headers(libaudcore_headers, subdir: 'libaudcore')

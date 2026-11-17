@@ -35,6 +35,7 @@
 #include "threads.h"
 #include "tuple.h"
 #include "vfs.h"
+#include "vfs_web.h"
 
 // regrettably, strcmp_nocase can't be used directly as a
 // callback for Index::sort due to taking a third argument;
@@ -248,6 +249,35 @@ static void add_playlist(const char * filename, Playlist::FilterFunc filter,
         add_generic(std::move(item), filter, user, result, false, true);
 }
 
+/* A playlist, channel or user page of YouTube or SoundCloud: its tracks. */
+static void add_web_list(const char * filename, Playlist::FilterFunc filter,
+                         void * user, AddResult * result, bool save_title)
+{
+    AUDINFO("Adding web list: %s\n", filename);
+    status_update(filename, result->items.len());
+
+    String title, error;
+    Index<PlaylistAddItem> items;
+
+    if (!web_read_list(filename, items, title, error))
+    {
+        aud_ui_show_error(str_printf(_("Error reading %s:\n%s"), filename,
+                                     (const char *)error));
+        return;
+    }
+
+    if (save_title && title)
+        result->title = title;
+
+    for (auto & item : items)
+    {
+        if (!filter || filter(item.filename, user))
+            add_file(std::move(item), filter, user, result, false);
+        else
+            result->filtered = true;
+    }
+}
+
 static void add_cuesheets(Index<String> & files, Playlist::FilterFunc filter,
                           void * user, AddResult * result)
 {
@@ -388,6 +418,8 @@ static void add_generic(PlaylistAddItem && item, Playlist::FilterFunc filter,
      * assume it's a playable file and skip some checks. */
     if (item.tuple.valid() || item.decoder || is_subtune(item.filename))
         add_file(std::move(item), filter, user, result, false);
+    else if (web_is_list(item.filename))
+        add_web_list(item.filename, filter, user, result, save_title);
     else
     {
         int tests = 0;

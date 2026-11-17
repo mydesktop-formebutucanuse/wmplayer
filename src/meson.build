@@ -1,6 +1,7 @@
 src_inc = include_directories('.')
 
 
+subdir('rust')
 subdir('libguess')
 subdir('libaudcore')
 subdir('libaudtag')
@@ -18,7 +19,6 @@ endif
 
 if get_option('dbus')
   subdir('dbus')
-  subdir('audtool')
 endif
 
 

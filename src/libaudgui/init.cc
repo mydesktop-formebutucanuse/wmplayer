@@ -197,6 +197,7 @@ static void load_fallback_icons ()
         "applications-internet",
         "appointment-new",
         "audacious",
+        "wmplayer",
         "audio-card",
         "audio-volume-high",
         "audio-volume-low",
@@ -286,7 +287,8 @@ static void load_fallback_icons ()
     static const char * const category_icons[] = {
         "applications-graphics",
         "applications-internet",
-        "audacious", /* for window icons */
+        "audacious",
+        "wmplayer", /* for window icons */
         "audio-x-generic", /* also used for fallback album art */
         "dialog-information",
         "multimedia-volume-control",
@@ -346,7 +348,7 @@ EXPORT void audgui_init ()
         g_setenv ("GDK_BACKEND", "x11", true);
 #endif
 
-    static char app_name[] = "audacious";
+    static char app_name[] = "wmplayer";
     static char * app_args[] = {app_name, nullptr};
 
     int dummy_argc = 1;
@@ -363,6 +365,7 @@ EXPORT void audgui_init ()
     aud_config_set_defaults ("audgui", audgui_defaults);
 
     status_init ();
+    web_browser_init ();
 
     hook_associate ("playlist set playing", playlist_set_playing_cb, nullptr);
     hook_associate ("playlist position", playlist_position_cb, nullptr);
@@ -372,7 +375,7 @@ EXPORT void audgui_init ()
 #endif
 
 #ifndef _WIN32
-    gtk_window_set_default_icon_name ("audacious");
+    gtk_window_set_default_icon_name ("wmplayer");
 #endif
 }
 
@@ -396,6 +399,7 @@ EXPORT void audgui_cleanup ()
     audgui_hide_prefs_window ();
     audgui_infopopup_hide ();
 
+    web_browser_cleanup ();
     plugin_menu_cleanup ();
     plugin_prefs_cleanup ();
 }

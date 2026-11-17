@@ -32,6 +32,7 @@
 #include "probe-buffer.h"
 #include "runtime.h"
 #include "vfs_local.h"
+#include "vfs_web.h"
 
 /* embedded plugins */
 static LocalTransport local_transport;
@@ -46,6 +47,9 @@ static TransportPlugin * lookup_transport(const char * filename, String & error,
         return &local_transport;
     if (!strcmp(scheme, "stdin"))
         return &stdin_transport;
+    /* a track's page at YouTube or SoundCloud, ahead of the HTTP plugin */
+    if (web_is_track(filename))
+        return &web_transport;
 
     for (PluginHandle * plugin : aud_plugin_list(PluginType::Transport))
     {

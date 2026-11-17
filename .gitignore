@@ -43,3 +43,4 @@ win32/override/README.txt
 *.so
 *.tar.bz2
 *~
+/src/rust/target/

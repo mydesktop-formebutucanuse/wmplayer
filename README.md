@@ -1,3 +1,45 @@
+# wmplayer
+
+**wmplayer** is [Audacious](https://audacious-media-player.org) with YouTube
+and SoundCloud built in. It is a fork: the player, its plugins and its skins
+are Audacious's, and what follows below is Audacious's own README.
+
+What wmplayer adds:
+
+* **Services → YouTube and SoundCloud …** (in the main menu and in the
+  playlist's Add menu): search videos, playlists, channels or SoundCloud
+  tracks, open a playlist, channel or uploader, and play or add what is chosen.
+* The address of a page plays like a file: a video or track
+  (`wmplayer https://www.youtube.com/watch?v=…`, *Add URL*, drag and drop),
+  and a playlist, channel or SoundCloud user or set, whose tracks are added.
+* Tracks are downloaded as they play (`~/.cache/wmplayer/web`, kept for a week
+  after they were last played), so seeking works, and the next track of the
+  playlist is fetched ahead.
+
+How it is put together:
+
+* The new code is Rust, in `src/rust`: `wmplayer` (the sites, yt-dlp, the
+  downloads), `core-ffi` (its C interface, linked into libaudcore) and
+  `gtk-ui` (the window, linked into libaudgui). The C++ side is
+  `src/libaudcore/vfs_web.cc` and `src/libaudgui/web-browser.cc`.
+* It needs `yt-dlp` at run time, and `cargo` and libcurl to build.
+* wmplayer installs next to Audacious and uses its plugins
+  (`LIBDIR/audacious`), data (`DATADIR/audacious`) and translations. Its own
+  libaudcore, libaudgui and libaudtag are in `LIBDIR/wmplayer`. `audtool`
+  controls it (the D-Bus name is Audacious's, so only one of the two runs at a
+  time).
+* Settings are in `~/.config/wmplayer`; the first start copies
+  `~/.config/audacious`.
+* Not yet: live streams, encrypted HLS, the Qt interface.
+
+Build and install:
+
+    meson setup build && ninja -C build && sudo ninja -C build install
+
+or, on Gentoo, `sudo sh gentoo/install.sh` (a live ebuild in a local overlay).
+
+---
+
 # Audacious
 
 ## Overview

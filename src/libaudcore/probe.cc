@@ -152,6 +152,33 @@ EXPORT PluginHandle * aud_file_find_decoder(const char * filename, bool fast,
         return mime_matches[0];
     }
 
+    if (!mime_matches.len() && !ext_matches.len())
+    {
+        /* a stream may know its file's extension when its address has none
+         * (a track of YouTube or SoundCloud) */
+        String file_ext = file.get_metadata("file-extension");
+
+        if (file_ext)
+        {
+            for (PluginHandle * plugin : list)
+            {
+                if (!aud_plugin_get_enabled(plugin))
+                    continue;
+
+                if (input_plugin_has_key(plugin, InputKey::Ext, file_ext))
+                    ext_matches.append(plugin);
+            }
+        }
+
+        if (ext_matches.len() == 1)
+        {
+            AUDINFO("Matched %s by the stream's extension %s.\n",
+                    aud_plugin_get_name(ext_matches[0]),
+                    (const char *)file_ext);
+            return ext_matches[0];
+        }
+    }
+
     file.set_limit_to_buffer(true);
 
     for (PluginHandle * plugin : (mime_matches.len()  ? mime_matches

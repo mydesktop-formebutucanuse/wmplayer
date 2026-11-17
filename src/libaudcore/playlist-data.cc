@@ -1151,7 +1151,8 @@ void PlaylistData::update_entry_from_scan(PlaylistEntry * entry,
     if (!entry->decoder)
         entry->decoder = request->decoder;
 
-    if (!entry->tuple.valid() && request->tuple.valid())
+    if ((!entry->tuple.valid() || request->tuple_changed) &&
+        request->tuple.valid())
     {
         set_entry_tuple(entry, std::move(request->tuple));
         queue_update(Playlist::Metadata, entry->number, 1, update_flags);

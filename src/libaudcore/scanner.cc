@@ -27,6 +27,7 @@
 #include "probe.h"
 #include "tuple.h"
 #include "vfs.h"
+#include "vfs_web.h"
 
 static GThreadPool * pool;
 
@@ -70,6 +71,35 @@ void ScanRequest::run()
 
     bool need_tuple = (flags & SCAN_TUPLE) && !tuple.valid();
     bool need_image = (flags & SCAN_IMAGE);
+
+    /* A track of YouTube or SoundCloud: the site says what it is, and its
+     * audio is downloaded only when it is played. */
+    if (need_tuple && web_is_track(audio_file))
+    {
+        if (!web_read_tuple(audio_file, tuple, error))
+            goto err;
+
+        need_tuple = false;
+
+        /* nothing more to do: finish without a file */
+        if (!(flags & SCAN_FILE) && !need_image)
+            goto err;
+    }
+    /* A track that came from a list may lack what the list did not tell
+     * (SoundCloud's tell only the titles): the site is asked when the track
+     * is played, as it is asked for the audio then anyway. */
+    else if ((flags & SCAN_FILE) && tuple.valid() &&
+             tuple.get_int(Tuple::Length) <= 0 && web_is_track(audio_file))
+    {
+        Tuple full;
+        String ignored;
+
+        if (web_read_tuple(audio_file, full, ignored))
+        {
+            tuple = std::move(full);
+            tuple_changed = true;
+        }
+    }
 
     if (!decoder)
         decoder = aud_file_find_decoder(audio_file, false, file, &error);

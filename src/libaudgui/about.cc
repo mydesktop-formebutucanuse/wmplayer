@@ -29,7 +29,7 @@
 #include "libaudgui.h"
 #include "libaudgui-gtk.h"
 
-static const char about_text[] = "<big><b>Audacious " VERSION "</b></big>\n" COPYRIGHT;
+static const char about_text[] = "<big><b>wmplayer " VERSION "</b></big>\n" COPYRIGHT;
 static const char website[] = "https://audacious-media-player.org";
 
 static GtkWidget * create_credits_notebook (const char * credits, const char * license)
@@ -70,7 +70,7 @@ static GtkWidget * create_about_window ()
     int dpi = audgui_get_dpi ();
 
     GtkWidget * about_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title ((GtkWindow *) about_window, _("About Audacious"));
+    gtk_window_set_title ((GtkWindow *) about_window, "About wmplayer");
     gtk_window_set_role ((GtkWindow *) about_window, "about");
     gtk_window_set_resizable ((GtkWindow *) about_window, false);
     gtk_container_set_border_width ((GtkContainer *) about_window, 3);
