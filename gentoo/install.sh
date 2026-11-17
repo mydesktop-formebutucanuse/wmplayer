@@ -1,7 +1,9 @@
 #!/bin/sh
 # Install wmplayer with emerge: puts the live ebuild
 # media-sound/wmplayer-9999 into a local overlay, accepts its (empty)
-# keywords and emerges it. Run as root, again whenever the ebuild changes:
+# keywords, turns off what this machine does not use in Audacious's plugins
+# (package.use) and emerges it. Run as root, again whenever the ebuild or
+# package.use changes:
 #   sudo sh gentoo/install.sh [OVERLAY]   default overlay: mydesktop
 # Code updates need no rerun: the ebuild builds the latest commit on GitHub,
 #   sudo emerge --oneshot media-sound/wmplayer
@@ -12,6 +14,7 @@ pkg=media-sound/wmplayer
 ebuild=wmplayer-9999.ebuild
 overlay=${1:-mydesktop}
 keywords=/etc/portage/package.accept_keywords/$overlay
+use=/etc/portage/package.use
 
 if [ "$(id -u)" -ne 0 ]; then
 	echo "Run as root: sudo sh $0 $*" >&2
@@ -35,4 +38,15 @@ if ! grep -qs "^$pkg[[:space:]]" "$keywords"; then
 	echo "added '$pkg **' to $keywords"
 fi
 
+# USE flags: a file of wmplayer's own, read after the one named audacious.
+if [ -d "$use" ]; then
+	install -m 644 "$here/package.use" "$use/wmplayer"
+	echo "installed $use/wmplayer"
+elif ! grep -qs "^media-plugins/audacious-plugins .*-alsa" "$use"; then
+	grep -v '^#' "$here/package.use" >>"$use"
+	echo "added the USE flags of $here/package.use to $use"
+fi
+
+# The plugins are built again only if their USE flags changed.
+emerge --oneshot --changed-use media-plugins/audacious-plugins
 emerge "$pkg"

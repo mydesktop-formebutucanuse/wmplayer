@@ -9,8 +9,6 @@ inherit cargo git-r3 meson xdg
 DESCRIPTION="Audacious with YouTube and SoundCloud built in"
 HOMEPAGE="https://github.com/mydesktop-formebutucanuse/wmplayer"
 EGIT_REPO_URI="https://github.com/mydesktop-formebutucanuse/wmplayer.git"
-# master follows Audacious; wmplayer is on its own branch.
-EGIT_BRANCH="wmplayer"
 
 # The Winamp-skin interface (src/skins) is under the GPL.
 LICENSE="BSD-2 GPL-3"
